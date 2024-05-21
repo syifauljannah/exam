@@ -65,6 +65,93 @@ class _HomePageStatefulState extends State<HomePageStateful> {
                   ),
                 );
               }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          postDataDialog(context);
+        },
+        child: Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+    );
+  }
+
+  void addAlbum(
+      int albumId, String title, String url, String thumbnailUrl) async {
+    Album newAlbum = Album(
+      albumId: albumId,
+      id: albums.isNotEmpty ? albums.last.id + 1 : 1,
+      title: title,
+      url: url,
+      thumbnailUrl: thumbnailUrl,
+    );
+
+    try {
+      await AlbumService.postData(newAlbum);
+      setState(() {
+        albums.add(newAlbum);
+      });
+    } catch (e) {
+      // Handle error
+    }
+  }
+
+  void postDataDialog(BuildContext context) {
+    TextEditingController albumIdController = TextEditingController();
+    TextEditingController titleController = TextEditingController();
+    TextEditingController urlController = TextEditingController();
+    TextEditingController thumbnailUrlController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Tambah Album'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                controller: albumIdController,
+                decoration: const InputDecoration(labelText: 'Album ID'),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(labelText: 'Judul'),
+              ),
+              TextField(
+                controller: urlController,
+                decoration: const InputDecoration(labelText: 'URL'),
+              ),
+              TextField(
+                controller: thumbnailUrlController,
+                decoration: const InputDecoration(labelText: 'Thumbnail URL'),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+              child: const Text('Batal'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+              child: const Text('Tambah'),
+              onPressed: () {
+                addAlbum(
+                  int.parse(albumIdController.text),
+                  titleController.text,
+                  urlController.text,
+                  thumbnailUrlController.text,
+                );
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
